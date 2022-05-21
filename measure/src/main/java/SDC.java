@@ -10,10 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SDC {
 
@@ -30,7 +27,7 @@ public class SDC {
     public static void main(String[] args) {
         System.out.println("hello world");
 
-        String fileName = "exercise.xlsx";
+        String fileName = "mall-auth_structure.xlsx";
         new SDC().calculate(fileName);
     }
 
@@ -70,12 +67,29 @@ public class SDC {
             classMap.get(className).addField(field);
         }
 
+/*
+        for(String className :classMap.keySet()){
+            System.out.println(className);
+            for(Method o:classMap.get(className).methodList){
+                System.out.println("  "+o.name);
+            }
+            for(Field f:classMap.get(className).fieldList){
+                System.out.println("   "+f.name+" "+f.modifier);
+            }
+        }
+*/
+
         //处理类-类关系信息表
         int[][] relationship =new int[index][index];
         hanleClassMethodRelationship(fileName,relationship);
         hanleClassFiledRelationship(fileName,relationship);
-
-        //计算指标
+//        for(String key:classMap.keySet()){
+//            Class c=classMap.get(key);
+//            System.out.println(key+" "+c.fieldList+" "+c.methodList);
+//        }
+//        //计算指标
+//        for(int[] r:relationship)
+//            System.out.println(Arrays.toString(r));
         double std1 = 0;
         for(int i=0;i<index;i++){
             for(int j=i+1;j<index;j++){
@@ -129,6 +143,9 @@ public class SDC {
             Class c = classMap.get(list.get(2));
             if(i==null||c==null)
                 continue;
+
+           // System.out.println("haha:"+list.get(0)+list.get(2));
+
             if (isMethodPublic(c.methodList, list.get(3))) {
                 int index1=interface2IndexMap.get(list.get(0));
                 int index2=class2IndexMap.get(list.get(2));
@@ -142,8 +159,14 @@ public class SDC {
         for(List<String> list:relationshipList){
             Interface i = interfaceMap.get(list.get(0));
             Class c = classMap.get(list.get(2));
+
+            if(i!=null)
+                System.out.println(list.get(0));
+            if(c!=null)
+                System.out.println(list.get(2));
             if(i==null||c==null)
                 continue;
+            //System.out.println("haha:"+list.get(0)+list.get(2));
             if (isFiledPublic(c.fieldList, list.get(3))) {
                 int index1=interface2IndexMap.get(list.get(0));
                 int index2=class2IndexMap.get(list.get(2));
@@ -159,6 +182,8 @@ public class SDC {
             Class class2=classMap.get(list.get(2));
             if(class1==null||class2==null)
                 continue;
+            //System.out.println("haha:"+list.get(0)+list.get(2));
+
             int index1=class2IndexMap.get(list.get(0));
             int index2=class2IndexMap.get(list.get(2));
             //判断这两个方法是不是public的
@@ -178,8 +203,10 @@ public class SDC {
             Class class2=classMap.get(list.get(2));
             if(class1==null||class2==null)
                 continue;
+
             //判断这两个方法是不是public的
             if(isFiledPublic(class2.fieldList,list.get(3))){
+
                 int index1=class2IndexMap.get(list.get(0));
                 int index2=class2IndexMap.get(list.get(2));
                 relationship[index1][index2]++;
@@ -191,13 +218,21 @@ public class SDC {
         Class class1=classMap.get(index2ClassMap.get(i));
         Class class2=classMap.get(index2ClassMap.get(j));
 
+        if(relationship[i][j]==0&&relationship[j][i]==0)
+            return 0;
+
         double std=0;
         int denominator1=class1.methodList.size()*(class2.publicFieldCount+class2.publicMethodCount);
-        if(denominator1>0)
-            std+=1.0*relationship[i][j]/denominator1;
+        if(denominator1>0) {
+            std += 1.0 * relationship[i][j] / denominator1;
+            //System.out.println(1.0 * relationship[i][j] / denominator1);
+        }
         int denominator2=class2.methodList.size()*(class1.publicFieldCount+class1.publicMethodCount);
-        if(denominator2>0)
-            std+=1.0*relationship[j][i]/denominator2;
+        if(denominator2>0) {
+            std += 1.0 * relationship[j][i] / denominator2;
+          //  System.out.println(1.0 * relationship[j][i] / denominator2);
+
+        }
 
         return std/2;
     }
@@ -285,7 +320,8 @@ public class SDC {
         String parameter;
         String returnType;
         String modifier;
-        public Method(String name,String parameter,String returnType,String modifier){
+        //目前来看并没有parameter属性，因为该属性被包含在了name里
+        public Method(String name,String modifier,String returnType,String parameter){
             this.name = name;
             this.parameter =parameter;
             this.returnType = returnType;
@@ -297,7 +333,7 @@ public class SDC {
         String name;
         String type;
         String modifier;
-        public Field(String name ,String type,String modifier){
+        public Field(String name ,String modifier,String type){
             this.name = name;
             this.type = type;
             this.modifier = modifier;

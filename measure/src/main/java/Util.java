@@ -16,11 +16,13 @@ public class Util {
     public static List<List<String>> readExcel(String filePath, int line,int index){
         Workbook workbook = readExcel(filePath);
 
-        Sheet sheet = workbook.getSheetAt(index);
+        //Sheet sheet = workbook.getSheetAt(index);
+        //通过sheet的名称获取表格
+        Sheet sheet = workbook.getSheet("data"+(index+1));
         List<List<String>> list=new ArrayList<>();
 
 
-        for(int j=sheet.getFirstRowNum();j<=sheet.getLastRowNum();j++){
+        for(int j=sheet.getFirstRowNum()+1;j<=sheet.getLastRowNum();j++){
             Row cur = sheet.getRow(j);
             if(cur==null)
                 continue;
@@ -55,5 +57,12 @@ public class Util {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    public static void main(String[] args){
+        List<List<String>> list=readExcel("mall-auth_structure.xlsx",5,0);
+        for(List<String> l:list)
+            System.out.println(l);
     }
 }

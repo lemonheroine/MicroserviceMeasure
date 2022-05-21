@@ -6,7 +6,7 @@ import java.util.Map;
 public class ESC {
 
     public static void main(String[] args){
-        new ESC().caculate("exercise.xlsx","exercise.xlsx");
+        new ESC().caculate("mall-admin.xlsx","mall-admin_structure.xlsx");
     }
 
     //需要传入两个参数，一个是ESC文件参数，一个是SDC文件参数
@@ -28,7 +28,7 @@ public class ESC {
         double loc2=getInterfaceESCValue(interfaceList,interfaceRelationship);
         System.out.println("interface loc is: "+loc2);
 
-        System.out.println("the value of");
+        System.out.println("the value of ESC is："+(loc1+loc2)/2);
         return (loc1+loc2)/2;
     }
 
@@ -86,25 +86,21 @@ public class ESC {
     private void readClassRelationship(String fileName,Map<String,Integer> map,int[][] relationship){
         List<List<String>> classRelationship =Util.readExcel(fileName,7,0);
         for(List<String> l:classRelationship){
-            if(!collectFormat(l))
-                continue;
 
-            if(map.containsKey(l.get(1))&&map.containsKey(l.get(4))){
-                relationship[map.get(l.get(1))][map.get(l.get(4))]++;
-                relationship[map.get(l.get(4))][map.get(l.get(1))]++;
+            if(map.containsKey(l.get(0))&&map.containsKey(l.get(2))){
+                relationship[map.get(l.get(0))][map.get(l.get(2))]++;
+                relationship[map.get(l.get(2))][map.get(l.get(0))]++;
             }
         }
     }
 
     private void readInterfaceRelationship(String fileName,Map<String,Integer> map,int[][] relationship){
-        List<List<String>> interfaceRelationship =Util.readExcel(fileName,7,2);
+        List<List<String>> interfaceRelationship =Util.readExcel(fileName,7,1);
         for(List<String> l:interfaceRelationship){
-            if(!collectFormat(l))
-                continue;
 
-            if(map.containsKey(l.get(1))&&map.containsKey(l.get(4))){
-                relationship[map.get(l.get(1))][map.get(l.get(4))]++;
-                relationship[map.get(l.get(4))][map.get(l.get(1))]++;
+            if(map.containsKey(l.get(0))&&map.containsKey(l.get(2))){
+                relationship[map.get(l.get(0))][map.get(l.get(2))]++;
+                relationship[map.get(l.get(2))][map.get(l.get(0))]++;
             }
         }
     }

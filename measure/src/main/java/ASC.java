@@ -2,11 +2,12 @@ import java.util.*;
 
 public class ASC {
 
+    //java.lang.Object这种情况可能需要处理
     public final static String[] removeTypeList = new String[]{"byte",
     "short","int","long","float","double","char","boolean"};
 
     public static void main(String[] args){
-        new ASC().caculate("exercise.xlsx");
+        new ASC().caculate("mall-auth_attribute.xlsx");
     }
 
     public double caculate(String fileName){

@@ -6,7 +6,7 @@ import java.util.Map;
 public class SSC {
 
     public static void main(String[] args){
-        new SSC().caculate("exercise.xlsx");
+        new SSC().caculate("mall-swarm-mall-auth.xlsx");
     }
 
     public double caculate(String fileName){
@@ -14,6 +14,12 @@ public class SSC {
         List<Class> classList=new ArrayList<>();
         Map<String,Class> classMap = new HashMap<>();
         readClassInfo(fileName,0,classList,classMap);
+//        for(Class c:classList){
+//            System.out.println(c.name);
+//            for(Method o:c.methodList){
+//                System.out.println("    "+o.vector+o.methodName);
+//            }
+//        }
         double loc1= getSSCValue(classList);
         System.out.println("class loc1 is: "+loc1);
 
@@ -105,8 +111,14 @@ public class SSC {
             this.textList = textList;
             this.vector = new ArrayList<>();
             this.vectorValue = 0;
+            if(vector.length()>0&&vector.charAt(0)=='[')
+                vector=vector.substring(1);
+            if(vector.length()>0&&vector.charAt(vector.charAt(vector.length()-1))==']')
+                vector = vector.substring(0,vector.length()-1);
             if(vector.length()>0){
                 for(String s:vector.split(",")){
+                    if(s.length()>0&&s.charAt(0)==' ')
+                        s=s.substring(1);
                     if(s.equals("0"))
                         this.vector.add(0);
                     if(s.equals("1")) {
