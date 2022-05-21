@@ -4,7 +4,7 @@ public class ASC {
 
     //java.lang.Object这种情况可能需要处理
     public final static String[] removeTypeList = new String[]{"byte",
-    "short","int","long","float","double","char","boolean"};
+    "short","int","long","float","double","char","boolean","Byte","Short","Integer","Long","Float","Double","Character","Boolean"};
 
     public static void main(String[] args){
         new ASC().caculate("mall-auth_attribute.xlsx");
@@ -183,8 +183,10 @@ public class ASC {
         }
 
         private void removeBasicType(){
-            for(String basicType:removeTypeList)
+            for(String basicType:removeTypeList) {
                 typeSet.remove(basicType);
+                typeSet.remove("java.lang."+basicType);
+            }
         }
     }
 }
