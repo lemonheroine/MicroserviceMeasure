@@ -24,6 +24,9 @@ public class SDC {
     Map<Integer,String> index2InterfaceMap = new HashMap<>();
     int interfaceIndex = 0;
 
+    //表示实际计算过程中实体到实体关系在数值计算时所占比重
+    final private double lambda = 0.5;
+
     public static void main(String[] args) {
         System.out.println("hello world");
 
@@ -131,8 +134,8 @@ public class SDC {
         }
         double loc2 = 1-std2/(index)/interfaceIndex;
         System.out.println("interface loc is: "+loc2);
-        System.out.println("the value of SDC is: "+(loc1+loc2)/2);
-        return (loc1+loc2)/2;
+        System.out.println("the value of SDC is: "+loc1*lambda+(1-lambda)*loc2);
+        return loc1*lambda+(1-lambda)*loc2;
     }
 
 
@@ -187,10 +190,15 @@ public class SDC {
             int index1=class2IndexMap.get(list.get(0));
             int index2=class2IndexMap.get(list.get(2));
             //判断这两个方法是不是public的
-            if(isMethodPublic(class1.methodList,list.get(1)))
+            if(isMethodPublic(class1.methodList,list.get(1))&&
+                    isMethodPublic(class2.methodList,list.get(3))){
+                relationship[index2][index1]++;
+            }
+
+            else if(isMethodPublic(class1.methodList,list.get(1)))
                 relationship[index2][index1]++;
 
-            if(isMethodPublic(class2.methodList,list.get(3))){
+            else if(isMethodPublic(class2.methodList,list.get(3))){
                 relationship[index1][index2]++;
             }
         }
@@ -276,7 +284,7 @@ public class SDC {
         public Interface(String name){
             this.name = name;
             this.methodList = new ArrayList<>();
-            this.publicMethodCount ++;
+            this.publicMethodCount =0;
         }
 
         public void addMethod(Method m){
