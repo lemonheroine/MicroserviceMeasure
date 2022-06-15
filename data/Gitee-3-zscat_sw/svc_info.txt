@@ -1,0 +1,1 @@
+user-center,file-center,member-center,goods-center,order-center,marking-center

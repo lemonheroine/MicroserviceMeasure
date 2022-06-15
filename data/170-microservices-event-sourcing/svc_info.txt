@@ -1,0 +1,1 @@
+catalog-service,inventory-service，account-service,shopping-cart-service,order-service,user-service,payment-service,edge-service
