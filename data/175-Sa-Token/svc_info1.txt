@@ -1,1 +1,1 @@
-hr-api-gateway-zuul,hr-config-server,hr-eureka-server,hr-oauth,hr-payroll,hr-user,hr-worker
+sa-token-alone-redis,sa-token-context-dubbo,sa-token-core,sa-token-dao-redis-jackson,sa-token-dao-redis,sa-token-dao-redisx,sa-token-dialect-thymeleaf,sa-token-jboot-plugin,sa-token-jfinal-plugin,sa-token-jwt,sa-token-oauth2,sa-token-quick-login,sa-token-reactor-spring-boot-starter,sa-token-servlet,sa-token-solon-plugin,sa-token-spring-aop,sa-token-spring-boot-starter,sa-token-sso,sa-token-temp-jwt

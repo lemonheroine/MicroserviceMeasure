@@ -200,6 +200,7 @@ public class SDC {
 
             else if(isMethodPublic(class2.methodList,list.get(3))){
                 relationship[index1][index2]++;
+
             }
         }
     }

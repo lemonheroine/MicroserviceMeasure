@@ -1,1 +1,1 @@
-light-reading-cloud-book,reading-cloud-homepage,light-reading-cloud-account
+light-reading-cloud-book,reading-cloud-homepage,light-reading-cloud-account,reading-cloud-account-feign-client,reading-cloud-book-feign-client,reading-cloud-common

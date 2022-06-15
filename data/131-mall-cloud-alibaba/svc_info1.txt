@@ -1,1 +1,1 @@
-mall-storage,mall-portal-order,mall-admin-ums,mall-admin-cms,mall-admin-pms,mall-portal-product,mall-portal-coupon,mall-portal-content,mall-admin-sms,mall-admin-oms,mall-portal-member
+mall-common,mall-storage,mall-portal-order,mall-admin-ums,mall-admin-cms,mall-admin-pms,mall-portal-product,mall-portal-coupon,mall-portal-content,mall-admin-sms,mall-admin-oms,mall-portal-member

@@ -1,1 +1,1 @@
-ruoyi-api-system,ruoyi-auth,ruoyi-common-core,ruoyi-common-datascope,ruoyi-common-datasource,ruoyi-common-log,ruoyi-common-redis,ruoyi-common-security,ruoyi-common-swagger,ruoyi-file,ruoyi-system,ruoyi-gateway,ruoyi-gen,ruoyi-job,ruoyi-monitor
+ruoyi-auth,ruoyi-file,ruoyi-system,ruoyi-gateway,ruoyi-gen,ruoyi-job,ruoyi-monitor

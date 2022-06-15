@@ -1,1 +1,1 @@
-jobsys-auth,jobsys-system,jobsys-file
+jobsys-api-system,jobsys-auth,jobsys-common-core,jobsys-common-datascope,jobsys-common-datasource,jobsys-common-log,jobsys-common-redis,jobsys-common-security,jobsys-common-swagger,jobsys-file,jobsys-gateway,jobsys-modules-gen,jobsys-modules-job,jobsys-modules-work,jobsys-monitor,jobsys-system

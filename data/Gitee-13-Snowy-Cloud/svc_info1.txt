@@ -1,1 +1,1 @@
-snowy-demo-app,snowy-main-app,snowy-xxl-job-app
+nacos-api,nacos-auth,nacos-client,nacos-cmdb,nacos-common,nacos-config,nacos-consistency,nacos-console,nacos-core,nacos-istio,nacos-naming,nacos-sys,snowy-actuator-app,snowy-auth-api,snowy-cache,snowy-common,snowy-context-api,snowy-core,snowy-demo-app,snowy-gateway-app,snowy-gen,snowy-main-app,snowy-security,snowy-sentinel-app,snowy-system,snowy-tenant-api,snowy-xxl-job-app

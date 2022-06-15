@@ -1,1 +1,1 @@
-CLOUD-PAYMENT-SERVICE,CLOUD-PROVIDER-HYSTRIX-PAYMENT,cloud-consumer-feign-hystrix-order80,cloud-consumer-feign-order80,cloud-consumer-order80,
+CLOUD-PAYMENT-SERVICE,CLOUD-PROVIDER-HYSTRIX-PAYMENT,cloud-consumer-feign-hystrix-order80,cloud-consumer-feign-order80,cloud-consumer-order80

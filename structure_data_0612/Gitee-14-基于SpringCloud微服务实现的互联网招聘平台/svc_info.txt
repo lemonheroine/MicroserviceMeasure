@@ -1,1 +1,1 @@
-jobsys-auth,jobsys-system,jobsys-file
+jobsys-auth,jobsys-system,jobsys-file,jobsys-modules-gen,jobsys-modules-job,jobsys-modules-work,jobsys-gateway,jobsys-monitor
