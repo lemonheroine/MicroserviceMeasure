@@ -1,0 +1,2 @@
+distCP(false): 2.0, DPC_MIFa and DPC_MIFe: 1.0, DPC_Ca: 1.0, DPC_Ce: 1.0, DPC_AIS and DPC_ADS: 1.0
+distCP(true): 2.0, DPC_MIFa: 1.0, MIFe: 1.0, DPC_Ca: 1.0, DPC_Ce: 1.0, AIS: 1.0, ADS: 1.0

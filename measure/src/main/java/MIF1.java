@@ -1,3 +1,11 @@
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,56 +23,92 @@ public class MIF1 {
     int interfaceIndex = 0;
 
     public static void main(String[] args) throws IOException {
-        String microservicesRecordFile = "svc_info.txt";
-        String projectPrefix = "structure_data_0612/";
 
-//        String projectLocation = "157-black-shop";
-//        String projectLocation = "61-microservice-recruit-master";
-//        String projectLocation = "63-springcloud-course";
-//        String projectLocation = "65-microservice_arch_springcloud";
-//        String projectLocation = "70-SpringCloudDemo";
-//        String projectLocation = "76-cangjingge";
-//        String projectLocation = "77-momo-cloud-permission";
-//        String projectLocation = "97-mall-swarm";
-//        String projectLocation = "107-msa-springcloud";
-//        String projectLocation = "116-spring-boot-microservices";
-//        String projectLocation = "123-madao_service";
-//        String projectLocation = "130-micro-service-springcloud";
-        String projectLocation = "131-mall-cloud-alibaba";
-//        String projectLocation = "165-mall4cloud";
-//        String projectLocation = "170-microservices-event-sourcing";
-//        String projectLocation = "175-Sa-Token";
-//        String projectLocation = "176-jcconf2018-microservice-with-springcloud";
-//        String projectLocation = "178-sc";
-//        String projectLocation = "185-RuoYi-Cloud";
-//        String projectLocation = "186-micro-service-springcloud";
-//        String projectLocation = "190-wanxin-p2p";
-//        String projectLocation = "195-iclyj-cloud";
-//        String projectLocation = "199-light-reading-cloud";
-//        String projectLocation = "230-food-ordering-backend-system";
-//        String projectLocation = "238-springcloud-oauth2";
-//        String projectLocation = "241-simplemall";
-//        String projectLocation = "260-SpringCloud-MSA";
-//        String projectLocation = "Gitee-2-springcloud2";
-//        String projectLocation = "Gitee-3-zscat_sw";
-//        String projectLocation = "Gitee-4-sc";
-//        String projectLocation = "Gitee-5-microservice-spring-cloud";
-//        String projectLocation = "Gitee-8-microservices-platform";
-//        String projectLocation = "Gitee-13-Snowy-Cloud";
-//        String projectLocation = "Gitee-14-基于SpringCloud微服务实现的互联网招聘平台";
-//        String projectLocation = "Gitee-18-rpush";
-//        String projectLocation = "Gitee-20-grocery-micro-service";
-//        String projectLocation = "Gitee-21-tangdao-master";
-//        String projectLocation = "Gitee-22-LibraPlatform";
+        runningBasicData();
 
-
-        String microservicesDependencies = "/"+projectLocation+"_structure.xlsx";
-        List<String> microservicesList = Arrays.asList(new String(Files.readAllBytes(Paths.get(projectPrefix+projectLocation+"/"+microservicesRecordFile)), StandardCharsets.UTF_8).split(",", -1));
-
-        new MIF1().calculateMicroservicesMIF(projectPrefix+projectLocation+"/",microservicesList,microservicesDependencies);
     }
 
-    public void calculateMicroservicesMIF(String projectPath, List<String>  microservicesList,String microservicesDependencies){
+    public static void runningBasicData() throws IOException {
+        String microservicesRecordFile = "svc_info.txt";
+        String projectPrefix = "structure_data_0612/";
+        String projectsListFile = "projectsList.txt";
+        BufferedReader br = new BufferedReader(new FileReader(projectPrefix+projectsListFile));
+        String projectLocation = "";
+        while ((projectLocation=br.readLine())!=null){
+            Workbook workbook  = new XSSFWorkbook(); //创建用于写入结果的excel工具类
+            String microservicesDependencies = "/"+projectLocation+"_structure.xlsx";
+            List<String> microservicesList = Arrays.asList(new String(Files.readAllBytes(Paths.get(projectPrefix+projectLocation+"/"+microservicesRecordFile)), StandardCharsets.UTF_8).split(",", -1));
+
+            MIF1 mif = new MIF1();
+            mif.calculateMicroservicesMIF(workbook,projectPrefix+projectLocation+"/",microservicesList,microservicesDependencies);
+            mif.printMicroservicesCoupling(workbook,microservicesList);
+
+            Util.writeExcel(workbook,projectPrefix+projectLocation+".xlsx");
+
+        }
+    }
+
+
+    public static void runningOREData() throws IOException {
+        String microservicesRecordFile = "svc_info.txt";
+        String projectPrefix = "data_0624_ORE/";
+
+        String projectsListFile = "versionsList.txt";
+        BufferedReader br = new BufferedReader(new FileReader(projectPrefix+projectsListFile));
+        String projectLocation = "";
+        while ((projectLocation=br.readLine())!=null){
+            Workbook workbook  = new XSSFWorkbook(); //创建用于写入结果的excel工具类
+            String microservicesDependencies = "/"+projectLocation+"_structure.xlsx";
+            List<String> microservicesList = Arrays.asList(new String(Files.readAllBytes(Paths.get(projectPrefix+projectLocation+"/"+microservicesRecordFile)), StandardCharsets.UTF_8).split(",", -1));
+
+            MIF1 mif = new MIF1();
+            mif.calculateMicroservicesMIF(workbook,projectPrefix+projectLocation+"/",microservicesList,microservicesDependencies);
+            mif.printMicroservicesCoupling(workbook,microservicesList);
+
+            Util.writeExcel(workbook,projectPrefix+projectLocation+".xlsx");
+
+        }
+    }
+
+    public void printMicroservicesCoupling(Workbook workbook,List<String> microservicesList){
+        Sheet sheet = Util.createSheet2(workbook);
+        int rowIndex = 0;
+
+        for (String micro: microservicesList){
+            Util.writeMicroserviceToSheet2(sheet, rowIndex++,microserviceMap.get(micro));
+        }
+    }
+
+    public void print2MicroservicesCoupling(Workbook workbook,double[][] MIF2MicroservicesMatrix,double[][] Ca2MicroservicesMatrix,
+                                            double[][] Ce2MicroservicesMatrix,double[][] ACT2MicroservicesMatrix){
+        Sheet sheet = Util.createSheet1(workbook);
+        int rowIndex = 0;
+
+        for(int i=0;i<microserviceIndex;i++){
+            for(int j=0;j<microserviceIndex;j++){
+                if (i==j) continue;
+                String dstMicroservice = index2MicroserviceMap.get(i);
+                String orgMicroservice = index2MicroserviceMap.get(j);
+                int EntitiesOfOrg = microserviceMap.get(orgMicroservice).getEntities();
+                int InterfaceOfOrg = microserviceMap.get(orgMicroservice).interfaceIndex;
+                int EntitiesOfDst = microserviceMap.get(dstMicroservice).getEntities();
+                int InterfaceOfDst = microserviceMap.get(dstMicroservice).interfaceIndex;
+
+
+                double MIF = MIF2MicroservicesMatrix[i][j]; // j depends on i
+                double Ca = Ca2MicroservicesMatrix[i][j];
+                double Ce = Ce2MicroservicesMatrix[j][i];
+                double ACT = ACT2MicroservicesMatrix[i][j];
+                Util.writeMicroserviceToSheet1(sheet, rowIndex++,orgMicroservice,EntitiesOfOrg, InterfaceOfOrg,
+                        dstMicroservice,EntitiesOfDst,InterfaceOfDst,
+                        ACT,Ca, Ce, MIF);
+            }
+        }
+    }
+
+
+
+    public void calculateMicroservicesMIF(Workbook workbook,String projectPath, List<String>  microservicesList,String microservicesDependencies){
         //先读取每个微服务结构数据
         for (String microserviceName: microservicesList){
             if (!microserviceMap.containsKey(microserviceName)){
@@ -84,6 +128,7 @@ public class MIF1 {
         double[][] MIF2MicroservicesMatrix =new double[microserviceIndex][microserviceIndex]; // 记录MIF指标的矩阵
         double[][] Ca2MicroservicesMatrix =new double[microserviceIndex][microserviceIndex]; // 记录Ca基础指标的矩阵
         double[][] Ce2MicroservicesMatrix =new double[microserviceIndex][microserviceIndex]; // 记录Ce基础指标的矩阵
+        double[][] ACT2MicroservicesMatrix =new double[microserviceIndex][microserviceIndex]; //记录AIS和ADS基础指标的矩阵
 
         for(MIF1.Microservice microservice1: microserviceMap.values()){
             double MIFaMicroservice = 0;
@@ -93,8 +138,6 @@ public class MIF1 {
             int CeMicroservice = 0;
             int AISMicroservice = 0;
             int ADSMicroservice = 0;
-            System.out.println("size of microservice "+ microservice1.name + " is " +microservice1.index);
-            System.out.println("interface size of microservice "+ microservice1.name + " is " +microservice1.interfaceIndex);
 
             for(MIF1.Microservice microservice2: microserviceMap.values()){
                 // 计算MIF指标
@@ -102,22 +145,24 @@ public class MIF1 {
                 int entitiesCount = microservice2.index;
                 allEntitiesCount += entitiesCount;
                 double MIF2Microservices = calculateTwoMicroservicesMIF(microservice1, microservice2);
-//                System.out.println("MIF value between microservices "+ microservice1.name + " and " + microservice2.name + " is: "+ MIF2Microservices);
 
-                MIFaMicroservice += entitiesCount * MIF2Microservices;
+//                MIFaMicroservice += entitiesCount * MIF2Microservices;
+                MIFaMicroservice += MIF2Microservices;
 
                 int microservice2Index = microservice2IndexMap.get(microservice2.name);
+                // to what extent microservice 2 depends on microservice 1
                 MIF2MicroservicesMatrix[microservice1Index][microservice2Index] = MIF2Microservices;
 
-                // 计算Ca指标
+                // 计算Ca指标: how many classes in microservice 2 depend on microservice 1
                 Ca2MicroservicesMatrix[microservice1Index][microservice2Index] = calculateTwoMicroservicesCa(microservice1, microservice2);
                 CaMicroservice += Ca2MicroservicesMatrix[microservice1Index][microservice2Index];
-                // 计算Ce指标
+                // 计算Ce指标: how many interfaces of microservice2 are depended upon by microservice1
                 Ce2MicroservicesMatrix[microservice1Index][microservice2Index] = calculateTwoMicroservicesCe(microservice1, microservice2);
                 CeMicroservice += Ce2MicroservicesMatrix[microservice1Index][microservice2Index];
 
                 //根据Ca矩阵计算AIS
                 if (Ca2MicroservicesMatrix[microservice1Index][microservice2Index]!=0){
+                    ACT2MicroservicesMatrix[microservice1Index][microservice2Index] = 1; // microservice 2 depend on microservice 1
                     AISMicroservice++;
                 }
                 //根据Ce矩阵计算ADS
@@ -126,31 +171,51 @@ public class MIF1 {
                 }
 
             }
-            if (allEntitiesCount==0)System.out.println("Error Microservices size");
-            else MIFaMicroservice /= allEntitiesCount;
-            System.out.println("Absolute Importance of the Service AIS of microservice " + microservice1.name + " is: "+ AISMicroservice);
-            System.out.println("Absolute Dependence of the Service ADS " + microservice1.name + " is: "+ ADSMicroservice);
-            System.out.println("Afferent Coupling Ca of microservice " + microservice1.name + " is: "+ CaMicroservice);
-            System.out.println("Efferent Coupling Ce of microservice " + microservice1.name + " is: "+ CeMicroservice);
-            System.out.println("Afferent MIFa value of microservice "+ microservice1.name + " is: "+ MIFaMicroservice);
-            System.out.println("----------------------------------------------------------");
+
+            microservice1.AIS = AISMicroservice;
+            microservice1.ADS = ADSMicroservice;
+            microservice1.Ca = CaMicroservice;
+            microservice1.Ce = CeMicroservice;
+            microservice1.MIFa = (double)MIFaMicroservice/(microserviceIndex-1);
 
             entitiesIndex += microservice1.index;
             interfaceIndex += microservice1.interfaceIndex;
         }
 
+        print2MicroservicesCoupling(workbook,MIF2MicroservicesMatrix,Ca2MicroservicesMatrix,
+                Ce2MicroservicesMatrix,ACT2MicroservicesMatrix);
+
         //计算传入依赖带来的微服务间影响MIF
         for (int i =0;i<microserviceIndex;i++){
             double MIFeMicroservice = 0;
             int allInterfacesCount = 0;
+
+            // test
+            double MIFetestb = 0;
+            double MIFetestB = 0;
+
             for (int j=0;j<microserviceIndex;j++){
                 if (j==i)continue;
                 int curInterfacesCount = microserviceMap.get(index2MicroserviceMap.get(j)).interfaceIndex;
                 allInterfacesCount += curInterfacesCount;
-                MIFeMicroservice += MIF2MicroservicesMatrix[j][i] * curInterfacesCount;
+
+//                MIFeMicroservice += MIF2MicroservicesMatrix[j][i] * curInterfacesCount;
+                MIFeMicroservice += MIF2MicroservicesMatrix[j][i];
+
+                // test
+//                if(curInterfacesCount==0){
+//
+//                }else MIFetestb += ((double)Ce2MicroservicesMatrix[i][j])/(double)curInterfacesCount;
+//                MIFetestB += Ce2MicroservicesMatrix[i][j];
             }
-            MIFeMicroservice /= allInterfacesCount;
-            System.out.println("Efferent MIFe value of microservice "+ index2MicroserviceMap.get(i) + " is: "+ MIFeMicroservice);
+//            MIFeMicroservice /= allInterfacesCount;
+            MIFeMicroservice /= (microserviceIndex-1);
+            microserviceMap.get(index2MicroserviceMap.get(i)).MIFe = MIFeMicroservice;
+
+            // test
+//            MIFetestB /= allInterfacesCount;
+//            microserviceMap.get(index2MicroserviceMap.get(i)).MIFetestb = MIFetestb;
+//            microserviceMap.get(index2MicroserviceMap.get(i)).MIFetestB = MIFetestB;
 
         }
 
@@ -161,8 +226,9 @@ public class MIF1 {
 //        System.out.println("MIF value of this system is: "+ MIF);
     }
 
+    // calculating how many classes in microservice2 depend on microservice1
     public int calculateTwoMicroservicesCa(MIF1.Microservice microservice1, MIF1.Microservice microservice2){
-        // 计算microservice2中有多少个类依赖microservice1
+
         HashSet<MIF1.Class> reachableEntities = new HashSet<>();
         for (MIF1.Interface interface1: microservice1.getInterfaceMap().values()){
             for (MIF1.Method operation: interface1.getMethodMap().values()){
@@ -180,7 +246,7 @@ public class MIF1 {
     }
 
     public int calculateTwoMicroservicesCe(MIF1.Microservice microservice1, MIF1.Microservice microservice2){
-        // 计算microservice2中有多少个接口被microservice1依赖
+        // calculating how many interfaces of microservice2 are depended upon by microservice1
         HashSet<MIF1.Interface> reachableInterfaces = new HashSet<>();
         for (MIF1.Interface interface1: microservice2.getInterfaceMap().values()){
             for (MIF1.Method operation: interface1.getMethodMap().values()){
@@ -195,6 +261,7 @@ public class MIF1 {
         return reachableInterfaces.size();
     }
 
+    // calculating to what extent microservice 2 depends on microservice 1
     public double calculateTwoMicroservicesMIF(MIF1.Microservice microservice1, MIF1.Microservice microservice2){
         int interfacesCount = microservice1.interfaceIndex;
         int entitiesCount = microservice2.index;
@@ -368,6 +435,7 @@ public class MIF1 {
             // 判断是否是来自同一个微服务的调用
             if (index1 == index2) System.out.println("invoking from the same microservices!!!");
             else interRelationIndex++;
+//            System.out.println(list);
             //将每个遍历到的方法到接口操作间调用关系记到被调用操作的内部list中
             microservice2.getInterfaceMap().get(list.get(4)).putInterMethodInvoker(list.get(5),list.get(0),list.get(1),list.get(2));
         }
@@ -385,6 +453,8 @@ public class MIF1 {
         Map<String,Integer> interface2IndexMap;
         Map<Integer,String> index2InterfaceMap;
         int interfaceIndex;
+
+        double MIFa, MIFe, Ca, Ce, AIS, ADS, MIFetestB,MIFetestb;
 
         public Microservice(String name){
             this.name = name;

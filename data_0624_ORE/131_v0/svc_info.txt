@@ -1,0 +1,1 @@
+mall-admin-ums,mall-portal-member,mall-admin-cms,mall-admin-sms,mall-portal-product,mall-storage,mall-admin-oms,mall-admin-pms,mall-portal-content,mall-portal-order,mall-portal-coupon,mall-boot-admin,mall-gateway

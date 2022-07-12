@@ -1,0 +1,1 @@
+mall-admin,mall-search,mall-demo,mall-portal,mall-monitor,mall-gateway

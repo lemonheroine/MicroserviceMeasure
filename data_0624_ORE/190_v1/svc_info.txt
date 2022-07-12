@@ -1,0 +1,1 @@
+content-search-service,repayment-service,discover-server,transaction-service,gateway-server,depository-agent-service,account-service,uaa-service,consumer-service

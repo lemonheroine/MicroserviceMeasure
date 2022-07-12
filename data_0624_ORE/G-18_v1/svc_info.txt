@@ -1,0 +1,1 @@
+rpush-scheduler,rpush-eureka rpush-zuul,rpush-server,rpush-route,rpush-monitor
