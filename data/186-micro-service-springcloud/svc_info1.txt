@@ -1,1 +1,0 @@
-MICRO-SERVICE-PROVIDER,micro-service-consumer,micro-service-interface,micro-service-server

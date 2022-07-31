@@ -1,1 +1,0 @@
-ruoyi-auth,ruoyi-file,ruoyi-system,ruoyi-gateway,ruoyi-gen,ruoyi-job,ruoyi-monitor

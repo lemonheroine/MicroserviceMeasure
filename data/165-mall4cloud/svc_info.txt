@@ -1,1 +1,0 @@
-mall4cloud-multishop,mall4cloud-order,mall4cloud-payment,mall4cloud-platform,mall4cloud-product,mall4cloud-rbac,mall4cloud-search,mall4cloud-user

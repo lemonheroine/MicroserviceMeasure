@@ -10,7 +10,7 @@ import java.util.Stack;
 
 public class SimulationAfferent {
     // input
-    private ArrayList<Integer> callarEntityNumbers;
+    private ArrayList<Integer> callerEntityNumbers;
     private int calleeInterfaceNumber;
     private int operationNumberLow;
     private int operationNumberUp;
@@ -27,22 +27,39 @@ public class SimulationAfferent {
     private ArrayList<InterDepMatrix> interDepMatrices;
     private ArrayList<OperationsManage> operationsManages;
     private CalleeOperations calleeOperations;
-    private int callarNumber;
+    private int callerNumber;
 
     Random randomSeed;
 
     // results
-    private double simulatedAIS;
-    private double simulatedCa;
-    private double simulatedMCIor;
+    private double[] simulatedAIS;
+    private double[] simulatedCa;
+    private double[] simulatedMCIor;
+
+    private double simulatedAISValue;
+    private double simulatedCaValue;
+    private double simulatedMCIorValue;
 
 
-    private double accumulatedDCF;
-    private double accumulatedDCS;
-    private double accumulatedICF;
-    private double accumulatedICS;
-    private double accumulatedOCF;
-    private double accumulatedOCS;
+    private double accumulatedDCFValue;
+    private double accumulatedDCSValue;
+    private double accumulatedICFValue;
+    private double accumulatedICSValue;
+    private double accumulatedOCFValue;
+    private double accumulatedOCSValue;
+
+    private double[] accumulatedDCF;
+    private double[] accumulatedDCS;
+    private double[] accumulatedICF;
+    private double[] accumulatedICS;
+    private double[] accumulatedOCF;
+    private double[] accumulatedOCS;
+
+    private int[] Depi;
+    private int depe;
+    private int accumulatedDistance;
+    private int accumulatedEntityNumber;
+
 
     private int currentDCF;
     private HashSet<Integer> directlyAffectedFiles;
@@ -53,10 +70,10 @@ public class SimulationAfferent {
      * Step 1: get input
 
      */
-    private SimulationAfferent(int callarNumber, int operationNumberLow, int operationNumberUp,
+    private SimulationAfferent(int callerNumber, int operationNumberLow, int operationNumberUp,
                                double interDependenciesDensityLow, double interDependenciesDensityUp, double intraDependenciesDensityLow, double intraDependenciesDensityUp, int iterations,
                                double interfaceChangingProbability, double operationDeletedProbability, double indirectPropagationProbability){
-        this.callarNumber = callarNumber;
+        this.callerNumber = callerNumber;
         this.operationNumberLow = operationNumberLow;
         this.operationNumberUp = operationNumberUp;
         this.interDependenciesDensityLow = interDependenciesDensityLow;
@@ -68,6 +85,7 @@ public class SimulationAfferent {
         this.indirectPropagationProbability = indirectPropagationProbability;
         this.iterations = iterations;
         this.randomSeed = new Random();
+
     }
 
     public void simulatingChanges(Sheet sheet, int rowIndex){
@@ -75,18 +93,32 @@ public class SimulationAfferent {
         this.generateDepMatrix(); // step 2
         System.out.println("generating operation sets");
         this.generateOperationSet();//step 3
+        // test
+        this.depe =0;
+        this.accumulatedDistance = 0;
+        this.accumulatedEntityNumber = 0;
+        this.Depi = new int[this.calleeInterfaceNumber];
+
         System.out.println("calculating coupling");
         this.calculateCouplingValues(); //step 4
 
-        this.accumulatedDCF = 0;
-        this.accumulatedDCS = 0;
-        this.accumulatedICF = 0;
-        this.accumulatedICS = 0;
-        this.accumulatedOCF = 0;
-        this.accumulatedOCS = 0;
+        this.accumulatedDCF = new double[this.callerNumber];
+        this.accumulatedDCS = new double[this.callerNumber];
+        this.accumulatedICF = new double[this.callerNumber];
+        this.accumulatedICS = new double[this.callerNumber];
+        this.accumulatedOCF = new double[this.callerNumber];
+        this.accumulatedOCS = new double[this.callerNumber];
+        this.accumulatedDCFValue = 0;
+        this.accumulatedDCSValue = 0;
+        this.accumulatedICFValue = 0;
+        this.accumulatedICSValue = 0;
+        this.accumulatedOCFValue = 0;
+        this.accumulatedOCSValue = 0;
+
+
+
         int remainTimes = this.iterations;
         while(remainTimes-->0){ // iteration times for step 5 to step 8
-//            System.out.println("changing callee");
             this.changeCalleeMicroservice();
         }
 
@@ -95,18 +127,18 @@ public class SimulationAfferent {
 
     private void printSimulationResult(Sheet sheet, int rowIndex){
         int overallEntities = 0;
-        for(int i=0;i<this.callarNumber;i++){
-            overallEntities += this.callarEntityNumbers.get(i);
+        for(int i=0;i<this.callerNumber;i++){
+            overallEntities += this.callerEntityNumbers.get(i);
+
         }
         System.out.println("overallEntities: "+overallEntities);
-//        double base = this.iterations*overallEntities;
-        double base = this.iterations*this.callarNumber;
+        double base = this.iterations*overallEntities;
 
         Util.writeToSimulationAfferentResult(sheet,rowIndex,this.calleeInterfaceNumber,
-                this.simulatedAIS,this.simulatedCa,this.simulatedMCIor,
-                (double)this.accumulatedDCF/base,(double)this.accumulatedDCS/base,
-                (double)this.accumulatedICF/base, (double)this.accumulatedICS/base,
-                (double)this.accumulatedOCF/base,(double)this.accumulatedOCS/base);
+                this.simulatedAISValue,this.simulatedCaValue,this.simulatedMCIorValue,
+                (double)this.accumulatedDCFValue/base,(double)this.accumulatedDCSValue/base,
+                (double)this.accumulatedICFValue/base, (double)this.accumulatedICSValue/base,
+                (double)this.accumulatedOCFValue/base,(double)this.accumulatedOCSValue/base);
 
     }
 
@@ -118,14 +150,14 @@ public class SimulationAfferent {
         int rowIndex = 0;
         int resultNumber = 100;
         while(resultNumber-->0){
-            SimulationAfferent simulation = new SimulationAfferent(2,
+            SimulationAfferent simulation = new SimulationAfferent(10,
                     3,7,0,1,
-                    0,1,1,
-                    0.1,0.33,0.02);
+                    0,1,1000,
+                    0.02,0.33,0.02);
             simulation.simulatingChanges(sheet,rowIndex++);
         }
 
-        Util.writeExcel(workbook,resultPrefix+"simulationResult"+"RandomSize.xlsx");
+        Util.writeExcel(workbook,resultPrefix+"simulationAfferentResult"+"RandomSize.xlsx");
 
     }
 
@@ -137,46 +169,45 @@ public class SimulationAfferent {
         this.intraDepMatrices = new ArrayList<>();
         // initialize the size of callee
 //        this.calleeInterfaceNumber = randomSeed.nextInt(4)+1; // the interface range of callee is 1-4
-        this.calleeInterfaceNumber = randomSeed.nextInt(2)+1; // the interface range of callee is 1-4
-        // initialize the sizes of callar and the dependency matrices
-        this.callarEntityNumbers = new ArrayList<>();
-        for (int i=0;i<this.callarNumber;i++){
-//            int callarEntityNumber = randomSeed.nextInt(25)+4; // the entity range of callar is 4-28
-            int callarEntityNumber = randomSeed.nextInt(2)+3;
-            this.callarEntityNumbers.add(callarEntityNumber);
+        this.calleeInterfaceNumber = 4;
+        // initialize the sizes of caller and the dependency matrices
+        this.callerEntityNumbers = new ArrayList<>();
+        for (int i=0;i<this.callerNumber;i++){
+            int callerEntityNumber = randomSeed.nextInt(25)+4; // the entity range of caller is 4-28
+            this.callerEntityNumbers.add(callerEntityNumber);
 
-            this.interDepMatrices.add(new InterDepMatrix(callarEntityNumber,this.calleeInterfaceNumber));
-            this.intraDepMatrices.add(new IntraDepMatrix(callarEntityNumber));
+            this.interDepMatrices.add(new InterDepMatrix(callerEntityNumber,this.calleeInterfaceNumber));
+            this.intraDepMatrices.add(new IntraDepMatrix(callerEntityNumber));
 
             // initialize the intra-dependency matrix
-            int intraDependenciesNumberUp = (int) Math.ceil(this.intraDependenciesDensityUp*callarEntityNumber*(callarEntityNumber-1));
-            int intraDependenciesNumberLow = (int) Math.floor(this.intraDependenciesDensityLow*callarEntityNumber*(callarEntityNumber-1));
+            int intraDependenciesNumberUp = (int) Math.ceil(this.intraDependenciesDensityUp*callerEntityNumber*(callerEntityNumber-1));
+            int intraDependenciesNumberLow = (int) Math.floor(this.intraDependenciesDensityLow*callerEntityNumber*(callerEntityNumber-1));
             int intraDependenciesNumber = intraDependenciesNumberLow;
             if(intraDependenciesNumberUp>intraDependenciesNumberLow)intraDependenciesNumber+=randomSeed.nextInt(intraDependenciesNumberUp-intraDependenciesNumberLow+1);
             ArrayList<Integer> intraDependenciesList = new ArrayList<>();
             for(int k=0;k<intraDependenciesNumber;k++){
-                int dependingEntity = randomSeed.nextInt(callarEntityNumber);
-                int dependedEntity = randomSeed.nextInt(callarEntityNumber);
-                while(intraDependenciesList.contains(dependingEntity*callarEntityNumber+dependedEntity)
+                int dependingEntity = randomSeed.nextInt(callerEntityNumber);
+                int dependedEntity = randomSeed.nextInt(callerEntityNumber);
+                while(intraDependenciesList.contains(dependingEntity*callerEntityNumber+dependedEntity)
                         ||dependingEntity==dependedEntity){
-                    dependingEntity = randomSeed.nextInt(callarEntityNumber);
-                    dependedEntity = randomSeed.nextInt(callarEntityNumber);
+                    dependingEntity = randomSeed.nextInt(callerEntityNumber);
+                    dependedEntity = randomSeed.nextInt(callerEntityNumber);
                 }
-                intraDependenciesList.add(dependingEntity*callarEntityNumber+dependedEntity);
+                intraDependenciesList.add(dependingEntity*callerEntityNumber+dependedEntity);
                 this.intraDepMatrices.get(i).set(dependingEntity,dependedEntity,1);
             }
 
             // initialize the inter-dependency matrix
-            int interDependenciesNumberUp = (int) Math.ceil(this.interDependenciesDensityUp*callarEntityNumber*this.calleeInterfaceNumber);
-            int interDependenciesNumberLow = (int) Math.ceil(this.interDependenciesDensityLow*callarEntityNumber*this.calleeInterfaceNumber);
+            int interDependenciesNumberUp = (int) Math.ceil(this.interDependenciesDensityUp*callerEntityNumber*this.calleeInterfaceNumber);
+            int interDependenciesNumberLow = (int) Math.ceil(this.interDependenciesDensityLow*callerEntityNumber*this.calleeInterfaceNumber);
             int interDependenciesNumber = interDependenciesNumberLow;
             if(interDependenciesNumberUp>interDependenciesNumberLow)interDependenciesNumber+=randomSeed.nextInt(interDependenciesNumberUp-interDependenciesNumberLow+1);
             ArrayList<Integer> interDependenciesList = new ArrayList<>();
             for(int k=0;k<interDependenciesNumber;k++){
-                int dependingEntity = randomSeed.nextInt(callarEntityNumber);
+                int dependingEntity = randomSeed.nextInt(callerEntityNumber);
                 int dependedInterface = randomSeed.nextInt(this.calleeInterfaceNumber);
                 while(interDependenciesList.contains(dependingEntity*this.calleeInterfaceNumber+dependedInterface)){
-                    dependingEntity = randomSeed.nextInt(callarEntityNumber);
+                    dependingEntity = randomSeed.nextInt(callerEntityNumber);
                     dependedInterface = randomSeed.nextInt(this.calleeInterfaceNumber);
                 }
                 interDependenciesList.add(dependingEntity*this.calleeInterfaceNumber+dependedInterface);
@@ -196,27 +227,31 @@ public class SimulationAfferent {
             this.calleeOperations.interfaceOperationSet[i] = this.operationNumberLow+this.randomSeed.nextInt(this.operationNumberUp-this.operationNumberLow+1);
         }
 
-        // generate random dependent operations of the entities in each callar service
+        // generate random dependent operations of the entities in each caller service
         this.operationsManages = new ArrayList<>();
-        for (int ith=0;ith<this.callarNumber;ith++){
-            int callarEntityNumber = this.callarEntityNumbers.get(ith);
+        for (int ith=0;ith<this.callerNumber;ith++){
+            int callerEntityNumber = this.callerEntityNumbers.get(ith);
 
             // initialize the operationManage
-            this.operationsManages.add(new OperationsManage(callarEntityNumber,this.calleeInterfaceNumber));
+            this.operationsManages.add(new OperationsManage(callerEntityNumber,this.calleeInterfaceNumber));
 
             // generate randomly the dependent operations of each entity
             for(int j=0;j<this.calleeInterfaceNumber;j++){
                 // derive the operation number of the current interface
                 int operationNumber = this.calleeOperations.interfaceOperationSet[j];
 
-                for(int i=0;i<callarEntityNumber;i++){
+                for(int i=0;i<callerEntityNumber;i++){
                     if(this.interDepMatrices.get(ith).get(i,j)==1){//the current entity depends on the current interface
                         this.operationsManages.get(ith).dependentOperationSet[i][j] = new OperationSet(operationNumber);
-                        for(int k=0;k<operationNumber;k++){
-                            if(randomSeed.nextBoolean()){// the current operation in the interface is depended by the current entity
-                                this.operationsManages.get(ith).dependentOperationSet[i][j].operations[k] = 1;
+                        int dependentOperationNumber = randomSeed.nextInt(operationNumber)+1; // at least one operation is depended upon
+                        for(int k=0;k<dependentOperationNumber;k++){
+                            int currentDependentOperation = randomSeed.nextInt(operationNumber);
+                            if(this.operationsManages.get(ith).dependentOperationSet[i][j].operations[currentDependentOperation]==1){
+                                currentDependentOperation = randomSeed.nextInt(operationNumber);
                             }
+                            this.operationsManages.get(ith).dependentOperationSet[i][j].operations[currentDependentOperation] = 1;
                         }
+
 
                     }
                 }
@@ -226,22 +261,36 @@ public class SimulationAfferent {
     }
 
     /**
-     * Step 4: calculate the coupling values from callar to callee
+     * Step 4: calculate the coupling values from caller to callee
      */
     private void calculateCouplingValues(){
-        double ACT2MicroservicesMatrix = 0;
-        double Ca2MicroservicesMatrix = 0;
-        double MCI2MicroservicesMatrix = 0;
+        this.simulatedAIS = new double[this.callerNumber];
+        this.simulatedCa = new double[this.callerNumber];
+        this.simulatedMCIor = new double[this.callerNumber];
 
-        for(int ith=0;ith<this.callarNumber;ith++){
-            ACT2MicroservicesMatrix += this.calculateSimulatedACT(ith);
-            Ca2MicroservicesMatrix += this.calculateSimulatedCaT(ith);
-            MCI2MicroservicesMatrix += this.calculateSimulatedMCI(ith);
+
+        for(int ith=0;ith<this.callerNumber;ith++){
+            double AIS = this.calculateSimulatedACT(ith);
+            this.simulatedAIS[ith] = AIS;
+            this.simulatedAISValue += AIS;
+            double Ca = this.calculateSimulatedCaT(ith);
+            this.simulatedCa[ith] = Ca;
+            this.simulatedCaValue += Ca;
+            double MCI = this.calculateSimulatedMCI(ith);
+            this.simulatedMCIor[ith] = MCI;
+
         }
 
-        this.simulatedAIS = ACT2MicroservicesMatrix;
-        this.simulatedCa = Ca2MicroservicesMatrix;
-        this.simulatedMCIor = MCI2MicroservicesMatrix/this.callarNumber;
+        int reachableInterfaces = 0;
+        for(int i=0;i<this.calleeInterfaceNumber;i++){
+            reachableInterfaces+=this.Depi[i];
+        }
+
+        if(reachableInterfaces!=0){
+            this.simulatedMCIorValue = ((double) reachableInterfaces / (this.calleeInterfaceNumber)) *
+                    ((double) this.depe / this.accumulatedEntityNumber + (double) this.depe / this.accumulatedDistance);
+        }
+
 
     }
 
@@ -257,10 +306,11 @@ public class SimulationAfferent {
                 isChangingInterfaceInCallee = true;
             }
         }
-        if(isChangingInterfaceInCallee)
+        if(isChangingInterfaceInCallee) {
             deleteOperationsOfCallee(isChangingInterface);
             checkRippleEffect(isChangingInterface);// go to step 6
-        // else: the current ripple effects are zeros
+        }// else: the current ripple effects are zeros
+
     }
 
     /**
@@ -282,19 +332,19 @@ public class SimulationAfferent {
     }
 
     /**
-     * Step 6: determine whether there is entity in callar invoking the interface deleting operations
+     * Step 6: determine whether there is entity in caller invoking the interface deleting operations
      * @param isChangingInterface
      */
     private void checkRippleEffect(boolean [] isChangingInterface){
-        for(int ith=0;ith<this.callarNumber;ith++){
-            int callarEntityNumber = this.callarEntityNumbers.get(ith);
+        for(int ith=0;ith<this.callerNumber;ith++){
+            int callerEntityNumber = this.callerEntityNumbers.get(ith);
 
             boolean [] isDependedChangingInterface = new boolean[this.calleeInterfaceNumber];
             boolean isChangingInterfaceDepended = false;
 
             for(int i=0;i<this.calleeInterfaceNumber;i++){
                 if(isChangingInterface[i]){ // an operation deletion event is to be happened
-                    for(int j=0;j<callarEntityNumber;j++){
+                    for(int j=0;j<callerEntityNumber;j++){
                         if(this.interDepMatrices.get(ith).get(j,i)==1){
                             isChangingInterfaceDepended = true;
                             isDependedChangingInterface[i] = true; // the changing interface is depended on
@@ -315,13 +365,13 @@ public class SimulationAfferent {
     private void quantifyDirectRippleEffect(int ith, boolean [] isDependedChangingInterface) {
         this.currentDCF = 0;
         this.directlyAffectedFiles = new HashSet<Integer>();
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
 
         for (int i = 0; i < this.calleeInterfaceNumber; i++) {
-            if (isDependedChangingInterface[i]) { // determine the ripple effects of the current changing interface (that is depended on by callar)
+            if (isDependedChangingInterface[i]) { // determine the ripple effects of the current changing interface (that is depended on by caller)
                 // derive the entities that depend on this interface
                 ArrayList<Integer> dependingEntity = new ArrayList<Integer>();
-                for (int j = 0; j < callarEntityNumber; j++) {
+                for (int j = 0; j < callerEntityNumber; j++) {
                     if (this.interDepMatrices.get(ith).get(j,i) == 1) {
                         dependingEntity.add(j);
                     }
@@ -347,12 +397,10 @@ public class SimulationAfferent {
         }
 
         if (this.currentDCF != 0) {
-//            this.accumulatedDCF += this.currentDCF;
-//            this.accumulatedDCS += this.directlyAffectedFiles.size();
-            this.accumulatedDCF += (double)this.currentDCF/callarEntityNumber;
-            double currentDCS = (double)this.directlyAffectedFiles.size()/callarEntityNumber;
-            this.accumulatedDCS += currentDCS;
-
+            this.accumulatedDCF[ith] += (double)this.currentDCF/callerEntityNumber;
+            this.accumulatedDCS[ith] += (double)this.directlyAffectedFiles.size()/callerEntityNumber;
+            this.accumulatedDCFValue += this.currentDCF;
+            this.accumulatedDCSValue += this.directlyAffectedFiles.size();
             this.quantifyIndirectRippleEffectDFS(ith, this.directlyAffectedFiles);// go to step 8
         }// else: the current direct ripple effects are zeros
 
@@ -366,14 +414,14 @@ public class SimulationAfferent {
     private void quantifyIndirectRippleEffectDFS(int ith, HashSet<Integer> directlyAffectedFiles ) {
         this.indirectlyAffectedFiles = new HashSet<Integer>(); // for recording the indirectly affected files
         this.currentICF = 0;
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
 
         for (Integer directlyAffectedFile : directlyAffectedFiles) {
             Stack<Integer> rippleStack = new Stack<>();
-            boolean[] fileAffected = new boolean[callarEntityNumber];
+            boolean[] fileAffected = new boolean[callerEntityNumber];
             fileAffected[directlyAffectedFile] = true;
 
-            for (int i = 0; i < callarEntityNumber; i++)
+            for (int i = 0; i < callerEntityNumber; i++)
                 if (this.intraDepMatrices.get(ith).get(i,directlyAffectedFile) == 1) rippleStack.push(i);
 
             while (!rippleStack.isEmpty()) {
@@ -386,22 +434,26 @@ public class SimulationAfferent {
                     fileAffected[file] = true;
                     this.currentICF++;
 
-                    for (int j = 0; j < callarEntityNumber; j++) {
+                    for (int j = 0; j < callerEntityNumber; j++) {
                         if (this.intraDepMatrices.get(ith).get(j,file) == 1) rippleStack.push(j);
                     }
                 }
             }
         }
         if(this.indirectlyAffectedFiles.size()>this.directlyAffectedFiles.size()){
-            System.out.println("the indirect ripple effects are larger than the direct");
+//            System.out.println("the indirect ripple effects are larger than the direct");
         }
-        this.accumulatedICF += (double)this.currentICF/callarEntityNumber;
-        this.accumulatedICS += (double)this.indirectlyAffectedFiles.size()/callarEntityNumber;
+        this.accumulatedICF[ith] += (double)this.currentICF/callerEntityNumber;
+        this.accumulatedICS[ith] += (double)this.indirectlyAffectedFiles.size()/callerEntityNumber;
+        this.accumulatedICFValue += this.currentICF;
+        this.accumulatedICSValue += this.indirectlyAffectedFiles.size();
 
-        this.accumulatedOCF += (double)(this.currentICF+this.currentDCF)/callarEntityNumber;
+        this.accumulatedOCF[ith] += (double)(this.currentICF+this.currentDCF)/callerEntityNumber;
         this.indirectlyAffectedFiles.addAll(this.directlyAffectedFiles);
-        this.accumulatedOCS += (double)this.indirectlyAffectedFiles.size()/callarEntityNumber;
+        this.accumulatedOCS[ith] += (double)this.indirectlyAffectedFiles.size()/callerEntityNumber;
 
+        this.accumulatedOCFValue += (this.currentICF+this.currentDCF);
+        this.accumulatedOCSValue += this.indirectlyAffectedFiles.size();
     }
 
 
@@ -414,11 +466,11 @@ public class SimulationAfferent {
     }
 
     private void putIntraInvokerEntities(int ith, int distance, int distanceTable[], int curEntityID){
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
-        if(distance == callarEntityNumber)return;
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
+        if(distance == callerEntityNumber)return;
         distance++;
-        for(int i=0;i<callarEntityNumber;i++){
-            if(this.intraDepMatrices.get(ith).get(i,curEntityID)==1){//向上回溯调用了curEntity的callar内实体，并更新其距离表
+        for(int i=0;i<callerEntityNumber;i++){
+            if(this.intraDepMatrices.get(ith).get(i,curEntityID)==1){//向上回溯调用了curEntity的caller内实体，并更新其距离表
                 if (distanceTable[i]==-1 || distanceTable[i] > distance){
                     distanceTable[i] = distance;
                     putIntraInvokerEntities(ith,distance,distanceTable,i);
@@ -428,17 +480,18 @@ public class SimulationAfferent {
     }
 
     private double calculateSimulatedMCI(int ith){
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
-        int distanceTable[] = new int[callarEntityNumber];
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
+        int distanceTable[] = new int[callerEntityNumber];
         // 初始化所有微服务2中实体到微服务1中接口的距离为-1
-        for(int i=0;i<callarEntityNumber;i++) distanceTable[i] = -1;
+        for(int i=0;i<callerEntityNumber;i++) distanceTable[i] = -1;
 
-        //统计callee微服务中被callar微服务依赖的接口数
+        //统计callee微服务中被caller微服务依赖的接口数
         int reachableInterfaces = 0;
         for(int k = 0;k<this.calleeInterfaceNumber;k++){
             boolean reachable = false;
-            for(int j=0;j<callarEntityNumber;j++){
+            for(int j=0;j<callerEntityNumber;j++){
                 if(this.interDepMatrices.get(ith).get(j,k)==1){
+                    this.Depi[k]=1;
                     reachable=true;
                     // 计算所有微服务2中实体到当前操作的距离并更新distance表
                     updateDistanceTable(ith,distanceTable,j);
@@ -447,27 +500,34 @@ public class SimulationAfferent {
             if(reachable)reachableInterfaces++;
         }
 
+//        this.depi += reachableInterfaces;
+
         int reachableEntities = 0;
         int accumulatedDistance = 0;
         // 统计依赖微服务中依赖另一个微服务接口的实体数
-        for(int i = 0;i<callarEntityNumber;i++){
+        for(int i = 0;i<callerEntityNumber;i++){
             if (distanceTable[i]!=-1){
                 reachableEntities++;
                 accumulatedDistance += distanceTable[i];
             }
         }
 
+        // test
+        this.depe += reachableEntities;
+        this.accumulatedDistance += accumulatedDistance;
+        this.accumulatedEntityNumber += callerEntityNumber;
+
         if(reachableEntities!=0 && reachableInterfaces!=0) {
-            return ((double) reachableInterfaces / this.calleeInterfaceNumber) * ((double) reachableEntities / callarEntityNumber + (double) reachableEntities / accumulatedDistance);
+            return ((double) reachableInterfaces / this.calleeInterfaceNumber) * ((double) reachableEntities / callerEntityNumber + (double) reachableEntities / accumulatedDistance);
         }
         return 0;
     }
 
     private double calculateSimulatedCaT(int ith){
-        // calculating the number of entities in the callar microservice depends on the callee
+        // calculating the number of entities in the caller microservice depends on the callee
         int dependentEntities = 0;
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
-        for(int i=0;i<callarEntityNumber;i++) {
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
+        for(int i=0;i<callerEntityNumber;i++) {
             boolean dependent = false;
             for (int k = 0; k < this.calleeInterfaceNumber; k++) {
                 if (this.interDepMatrices.get(ith).get(i,k)==1){
@@ -480,12 +540,12 @@ public class SimulationAfferent {
     }
 
     private double calculateSimulatedCeT(int ith){
-        // calculating the number of interfaces in the callee microservice that is depended on by the callar
+        // calculating the number of interfaces in the callee microservice that is depended on by the caller
         int dependentInterfaces = 0;
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
         for(int k=0;k<this.calleeInterfaceNumber;k++) {
             boolean dependent = false;
-            for (int i = 0; i < callarEntityNumber; i++) {
+            for (int i = 0; i < callerEntityNumber; i++) {
                 if (this.interDepMatrices.get(ith).get(i,k)==1){
                     dependent=true;break;
                 }
@@ -496,10 +556,10 @@ public class SimulationAfferent {
     }
 
     private double calculateSimulatedACT(int ith){
-        // calculating whether the callar microservice depends on the callee
+        // calculating whether the caller microservice depends on the callee
         int dependentMicroservice = 0;
-        int callarEntityNumber = this.callarEntityNumbers.get(ith);
-        for(int i=0;i<callarEntityNumber;i++) {
+        int callerEntityNumber = this.callerEntityNumbers.get(ith);
+        for(int i=0;i<callerEntityNumber;i++) {
             for (int k = 0; k < this.calleeInterfaceNumber; k++) {
                 if (this.interDepMatrices.get(ith).get(i,k)==1){
                     dependentMicroservice=1;break;

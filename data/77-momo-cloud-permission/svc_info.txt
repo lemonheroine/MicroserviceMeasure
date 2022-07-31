@@ -1,1 +1,0 @@
-momo-permission-system-core-service,momo-permission-system-core-web,momo-permission-system-core-mapper,momo-permission-system-core-netty

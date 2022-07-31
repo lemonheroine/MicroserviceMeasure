@@ -1,1 +1,0 @@
-hotels-aggregator-service,available-hotels-service,best-hotels-service,crazy-hotels-service,eureka-naming-server

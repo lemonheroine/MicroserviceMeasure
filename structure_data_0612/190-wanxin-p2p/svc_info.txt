@@ -1,1 +1,0 @@
-account-service,consumer-service,content-search-service,depository-agent-service,wanxinp2p-repayment-service,wanxinp2p-transaction-service,wanxinp2p-uaa-service

@@ -1,1 +1,0 @@
-ACCOUNT-SERVICE,PRODUCT-SERVICE,payment-service,ORDER-SERVICE,msg-service

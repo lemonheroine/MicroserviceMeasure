@@ -1,1 +1,0 @@
-mall-admin,mall-portal,mall-auth,mall-demo,mall-search

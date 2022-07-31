@@ -1,1 +1,0 @@
-snowy-demo-app,snowy-main-app,snowy-xxl-job-app,snowy-actuator-app,snowy-sentinel-app,snowy-gateway-app

@@ -1,1 +1,0 @@
-grocery-admin,ace-sidecar-server,grocery-micro-service-auth-server,grocery-micro-service-crawler

@@ -1,4 +1,3 @@
-import javafx.geometry.Pos;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -151,6 +150,46 @@ public class Util {
         return sheet;
     }
 
+    public static Sheet createDPMResult(Workbook workbook, String sheetName){
+        Sheet sheet = workbook.createSheet(sheetName);
+        int rowIndex = 0;
+
+        Row titleRow = sheet.createRow(rowIndex);
+        titleRow.createCell(0).setCellValue("projectName");
+        titleRow.createCell(1).setCellValue("microservicesCount");
+
+        titleRow.createCell(2).setCellValue("distCP2Microservices");
+        titleRow.createCell(3).setCellValue("distCVMCI");
+        titleRow.createCell(4).setCellValue("distCVCaT");
+        titleRow.createCell(5).setCellValue("distCVCeT");
+        titleRow.createCell(6).setCellValue("distCVACT");
+
+        titleRow.createCell(7).setCellValue("DPM_MCI");
+        titleRow.createCell(8).setCellValue("DPM_CaT");
+        titleRow.createCell(9).setCellValue("DPM_CeT");
+        titleRow.createCell(10).setCellValue("DPM_ACT");
+
+        titleRow.createCell(11).setCellValue("distCPAfferent");
+        titleRow.createCell(12).setCellValue("distCVaMCI");
+        titleRow.createCell(13).setCellValue("distCVCa");
+        titleRow.createCell(14).setCellValue("distCVAIS");
+
+        titleRow.createCell(15).setCellValue("DPM_aMCI");
+        titleRow.createCell(16).setCellValue("DPM_Ca");
+        titleRow.createCell(17).setCellValue("DPM_AIS");
+
+        titleRow.createCell(18).setCellValue("distCPEfferent");
+        titleRow.createCell(19).setCellValue("distCVeMCI");
+        titleRow.createCell(20).setCellValue("distCVCe");
+        titleRow.createCell(21).setCellValue("distCVADS");
+
+        titleRow.createCell(22).setCellValue("DPM_eMCI");
+        titleRow.createCell(23).setCellValue("DPM_Ce");
+        titleRow.createCell(24).setCellValue("DPM_ADS");
+
+        return sheet;
+    }
+
     public static Sheet createSimulationResult(Workbook workbook, String sheetName){
         Sheet sheet = workbook.createSheet(sheetName);
         int rowIndex = 0;
@@ -189,6 +228,86 @@ public class Util {
         titleRow.createCell(9).setCellValue("OCS");
 
         return sheet;
+    }
+
+
+    public static Sheet createSimulationEfferentResult(Workbook workbook, String sheetName){
+        Sheet sheet = workbook.createSheet(sheetName);
+        int rowIndex = 0;
+
+        Row titleRow = sheet.createRow(rowIndex);
+        titleRow.createCell(0).setCellValue("callarEntityNumber");
+        titleRow.createCell(1).setCellValue("ADS");
+        titleRow.createCell(2).setCellValue("Ce");
+        titleRow.createCell(3).setCellValue("MCIee");
+        titleRow.createCell(4).setCellValue("DCF");
+        titleRow.createCell(5).setCellValue("DCS");
+        titleRow.createCell(6).setCellValue("ICF");
+        titleRow.createCell(7).setCellValue("ICS");
+        titleRow.createCell(8).setCellValue("OCF");
+        titleRow.createCell(9).setCellValue("OCS");
+
+        return sheet;
+    }
+
+    public static void writeToDPMResult(Sheet sheet, int rowIndex, String projectName, int microservicesCount,
+                                        int distCP2Microservices, int distCVMCI, int distCVCaT, int distCVCeT, int distCVACT,
+                                                       int distCPAfferent, int distCVaMCI, int distCVCa, int distCVAIS,
+                                                       int distCPEfferent, int distCVeMCI, int distCVCe, int distCVADS){
+
+        rowIndex++;
+        Row row = sheet.createRow(rowIndex);
+        row.createCell(0).setCellValue(projectName);
+        row.createCell(1).setCellValue(microservicesCount);
+
+        row.createCell(2).setCellValue(distCP2Microservices);
+        row.createCell(3).setCellValue(distCVMCI);
+        row.createCell(4).setCellValue(distCVCaT);
+        row.createCell(5).setCellValue(distCVCeT);
+        row.createCell(6).setCellValue(distCVACT);
+
+        row.createCell(7).setCellValue((double)distCVMCI/distCP2Microservices);
+        row.createCell(8).setCellValue((double)distCVCaT/distCP2Microservices);
+        row.createCell(9).setCellValue((double)distCVCeT/distCP2Microservices);
+        row.createCell(10).setCellValue((double)distCVACT/distCP2Microservices);
+
+        row.createCell(11).setCellValue(distCPAfferent);
+        row.createCell(12).setCellValue(distCVaMCI);
+        row.createCell(13).setCellValue(distCVCa);
+        row.createCell(14).setCellValue(distCVAIS);
+
+        row.createCell(15).setCellValue((double)distCVaMCI/distCPAfferent);
+        row.createCell(16).setCellValue((double)distCVCa/distCPAfferent);
+        row.createCell(17).setCellValue((double)distCVAIS/distCPAfferent);
+
+        row.createCell(18).setCellValue(distCPEfferent);
+        row.createCell(19).setCellValue(distCVeMCI);
+        row.createCell(20).setCellValue(distCVCe);
+        row.createCell(21).setCellValue(distCVADS);
+
+        row.createCell(22).setCellValue((double)distCVeMCI/distCPEfferent);
+        row.createCell(23).setCellValue((double)distCVCe/distCPEfferent);
+        row.createCell(24).setCellValue((double)distCVADS/distCPEfferent);
+
+    }
+
+    public static void writeToSimulationEfferentResult(Sheet sheet, int rowIndex, int callarEntityNumber,
+                                                       double ADS, double Ce, double MCIee,
+                                                       double DCF, double DCS, double ICF, double ICS, double OCF, double OCS){
+
+        rowIndex++;
+        Row row = sheet.createRow(rowIndex);
+        row.createCell(0).setCellValue(callarEntityNumber);
+        row.createCell(1).setCellValue(ADS);
+        row.createCell(2).setCellValue(Ce);
+        row.createCell(3).setCellValue(MCIee);
+        row.createCell(4).setCellValue(DCF);
+        row.createCell(5).setCellValue(DCS);
+        row.createCell(6).setCellValue(ICF);
+        row.createCell(7).setCellValue(ICS);
+        row.createCell(8).setCellValue(OCF);
+        row.createCell(9).setCellValue(OCS);
+
     }
 
     public static void writeToSimulationAfferentResult(Sheet sheet, int rowIndex, int calleeInterfaceNumber,
@@ -248,7 +367,7 @@ public class Util {
 
     }
 
-    public static void writeMicroserviceToSheet2(Sheet sheet, int rowIndex, MIF1.Microservice microservice){
+    public static void writeMicroserviceToSheet2(Sheet sheet, int rowIndex, MCI.Microservice microservice){
         rowIndex++;
         Row row = sheet.createRow(rowIndex);
         row.createCell(0).setCellValue(microservice.name);
@@ -258,36 +377,10 @@ public class Util {
         row.createCell(4).setCellValue(microservice.ADS);
         row.createCell(5).setCellValue(microservice.Ca);
         row.createCell(6).setCellValue(microservice.Ce);
-        row.createCell(7).setCellValue(microservice.MIFa);
-        row.createCell(8).setCellValue(microservice.MIFe);
+        row.createCell(7).setCellValue(microservice.MCIa);
+        row.createCell(8).setCellValue(microservice.MCIe);
 //        row.createCell(10).setCellValue(microservice.MIFetestB);
 //        row.createCell(11).setCellValue(microservice.MIFetestb);
-    }
-
-    public static void writeMicroserviceToSheetTwoMicro(Sheet sheet, int rowIndex, String orgMicroservice, String dstMicroservice,
-                                                        PostProcessing.ArchitectureTwoMicro architecture, PostProcessing.RippleTwoMicro ripple){
-        System.out.println(orgMicroservice+", "+dstMicroservice);
-        rowIndex++;
-        Row row = sheet.createRow(rowIndex);
-        row.createCell(0).setCellValue(orgMicroservice);
-        row.createCell(1).setCellValue(dstMicroservice);
-        row.createCell(2).setCellValue(architecture.EntitiesOfOrg);
-        row.createCell(3).setCellValue(architecture.InterfaceOfOrg);
-        row.createCell(4).setCellValue(architecture.EntitiesOfDst);
-        row.createCell(5).setCellValue(architecture.InterfaceOfDst);
-        row.createCell(6).setCellValue(architecture.getACT());
-        row.createCell(7).setCellValue(architecture.getCaT());
-        row.createCell(8).setCellValue(architecture.CeT);
-        row.createCell(9).setCellValue(architecture.MIF);
-        row.createCell(10).setCellValue(ripple.BORE0);
-        row.createCell(11).setCellValue(ripple.CORE0);
-        row.createCell(12).setCellValue(ripple.BORE1);
-        row.createCell(13).setCellValue(ripple.CORE1);
-        row.createCell(14).setCellValue(ripple.BORE2);
-        row.createCell(15).setCellValue(ripple.CORE2);
-        row.createCell(16).setCellValue(ripple.BORE3);
-        row.createCell(17).setCellValue(ripple.CORE3);
-
     }
 
 

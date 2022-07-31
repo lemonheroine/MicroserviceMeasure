@@ -1,0 +1,1 @@
+mall4cloud-multishop,mall4cloud-order,mall4cloud-payment,mall4cloud-product,mall4cloud-rbac,mall4cloud-search,mall4cloud-user,mall4cloud-gateway,mall4cloud-auth,mall4cloud-biz,mall4cloud-leaf

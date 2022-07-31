@@ -1,0 +1,1 @@
+snowy-demo-app,nacos-console,nacos-sys,snowy-xxl-job-app,snowy-gateway-app,snowy-main-app,nacos-cmdb,snowy-actuator-app,snowy-sentinel-app,nacos-naming

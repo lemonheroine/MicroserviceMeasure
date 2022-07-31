@@ -1,1 +1,0 @@
-authentication-server,common,service-api,service-base,service-user,service-article

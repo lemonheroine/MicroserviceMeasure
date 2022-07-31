@@ -1,1 +1,0 @@
-black-shop-user-service,black-shop-goods-service,black-shop-shoppingcart-service,black-shop-order-service

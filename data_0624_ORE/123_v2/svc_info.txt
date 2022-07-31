@@ -1,1 +1,0 @@
-service-article,service-base,authentication-server,service-user,madao-web-gateway,madao-server-config

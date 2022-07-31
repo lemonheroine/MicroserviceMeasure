@@ -1,0 +1,1 @@
+user-center,goods-center,zuul-gateway,member-center,order-center,mall-uaa,sc-admin,log-center,job-admin,job-executor-samples,txlcn-tm,file-center,marking-center

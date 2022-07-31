@@ -1,0 +1,1 @@
+cangjingge-user,cangjingge-fiction-review,AUTHORIZATION,cangjingge-fiction,cangjingge-hystrix-dashboard,cangjingge-zuul-gateway,cangjingge-eureka-server

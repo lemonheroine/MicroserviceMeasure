@@ -1,1 +1,0 @@
-authentication-server,service-base,service-user,service-article
