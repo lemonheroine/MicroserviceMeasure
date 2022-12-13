@@ -138,7 +138,7 @@ public class SimulationEfferent {
     }
 
     public static void main(String[] args) throws IOException {
-        String resultPrefix = "simulation_RQ301/";
+        String resultPrefix = "data/simulation_RQ301/";
 
         Workbook workbook  = new XSSFWorkbook();
         Sheet sheet = Util.createSimulationEfferentResult(workbook,"round1");
